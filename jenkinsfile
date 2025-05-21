@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 // pipeline {
 // 	agent any
 // 	tools {
 //     	nodejs 'NodeJS'
 // 	}
+=======
+pipeline {
+	agent any
+	tools {
+    	nodejs 'NodeJS 24.0.2'
+	}
+>>>>>>> 3bdee9b9e79779e080a8bc2b1ebb329c2268e223
 
 // 	stages {
 //     	// Stage 1: Checkout Code
@@ -60,7 +68,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS' // Make sure this matches the configured NodeJS version in Jenkins
+        nodejs 'NodeJS 24.0.2' // Make sure this matches the configured NodeJS version in Jenkins
     }
 
     stages {
