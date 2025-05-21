@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --ci --reporters=default --reporters=jest-junit",
+    "test": "jest --ci --reporters=default --reporters=jest-junit --testResultsProcessor=jest-junit --outputFile=./test-results/test-report.xml",
     "start": "node index.js"
   },
   "keywords": [],
