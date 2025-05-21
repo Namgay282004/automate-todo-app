@@ -84,10 +84,10 @@ pipeline {
                     sh 'docker build -t 02230290namgay/node-app:latest -f backend/Dockerfile backend/'
                     
                     // Push to Docker Hub (requires credentials)
-                    withCredentials([string(credentialsId: 'docker-hub-creds', variable: 'DOCKER_PWD')]) {
-                        sh 'echo $DOCKER_PWD | docker login -u 02230290namgay --password-stdin'
-                        sh 'docker push 02230290namgay/node-app:latest'
-                    }
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PWD')]) {
+						sh 'echo $DOCKER_PWD | docker login -u $DOCKER_USER --password-stdin'
+						sh 'docker push 02230290namgay/node-app:latest'
+					}
                 }
             }
         }
