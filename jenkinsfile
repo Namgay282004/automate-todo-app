@@ -1,82 +1,57 @@
 pipeline {
-    agent any
-    tools {
-        nodejs 'LTS v20.x'
-    }
+	agent any
+	tools {
+    	nodejs 'NodeJS'
+	}
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/Namgay282004/automate-todo-app.git'
-            }
-        }
+	stages {
+    	// Stage 1: Checkout Code
+    	stage('Checkout') {
+        	steps {
+            	git branch: 'main',
+            	url: 'https://github.com/Namgay282004/automate-todo-app.git'
+        	}
+    	}
 
-        stage('Install Dependencies') {
-            parallel {
-                stage('Install Frontend') {
-                    steps {
-                        dir('frontend') {
-                            sh 'npm install'
-                        }
-                    }
-                }
-                stage('Install Backend') {
-                    steps {
-                        dir('backend') {
-                            sh 'npm install'
-                        }
-                    }
-                }
-            }
-        }
+    	// Stage 2: Install Dependencies
+    	stage('Install') {
+        	steps {
+            	sh 'npm install' 
+        	}
+    	}
 
-        stage('Build') {
-            steps {
-                dir('frontend') {
-                    sh 'npm run build'
-                }
-            }
-        }
+    	// Stage 3: Build (if applicable, e.g., for React/TypeScript)
+    	stage('Build') {
+        	steps {
+            	sh 'npm run build' 
+        	}
+    	}
 
-        stage('Test') {
-            parallel {
-                stage('Test Frontend') {
-                    steps {
-                        dir('frontend') {
-                            sh 'npm test'
-                        }
-                    }
-                }
-                stage('Test Backend') {
-                    steps {
-                        dir('backend') {
-                            sh 'npm test'
-                        }
-                    }
-                }
-            }
-            post {
-                always {
-                    junit 'frontend/junit.xml'
-                    junit 'backend/junit.xml'
-                }
-            }
-        }
+    	// Stage 4: Run Unit Tests
+    	stage('Test') {
+        	steps {
+            	sh 'npm test'  // Runs "test" script (Jest/Mocha)
+        	}
+        	post {
+            	always {
+                	junit 'junit.xml'  // Publish test results
+            	}
+        	}
+    	}
 
-        stage('Deploy') {
-            steps {
-                script {
-                    docker.build('02230290namgay/frontend:latest', 'frontend')
-                    docker.build('02230290namgay/backend:latest', 'backend')
-
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-creds') {
-                        docker.image('02230290namgay/frontend:latest').push()
-                        docker.image('02230290namgay/backend:latest').push()
-                    }
-                }
-            }
-        }
-    }
+    	// Stage 5: Deploy (Docker Example)
+    	stage('Deploy') {
+        	steps {
+            	script {
+                	// Build Docker image
+                	docker.build('02230290namgay/assignment2:latest')
+               	 
+                	// Push to Docker Hub (requires credentials)
+                	docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-creds') {
+                    	docker.image('02230290namgay/assignment2:latest').push()
+                	}
+            	}
+        	}
+    	}
+	}
 }
-
