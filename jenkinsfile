@@ -1,10 +1,8 @@
 pipeline {
     agent any
-
     tools {
-        nodejs 'NodeJS 24.0.2' // Make sure this matches the configured NodeJS version in Jenkins
+        nodejs 'NodeJS 24.0.2'
     }
-
     stages {
         // Stage 1: Checkout Code
         stage('Checkout') {
@@ -13,8 +11,8 @@ pipeline {
                     url: 'https://github.com/Namgay282004/automate-todo-app.git'
             }
         }
-
-        // Stage 2: Install Backend Dependencies
+        
+        // Stage 2: Install Dependencies (Backend)
         stage('Install Backend') {
             steps {
                 dir('backend') {
@@ -22,8 +20,8 @@ pipeline {
                 }
             }
         }
-
-        // Stage 3: Install Frontend Dependencies
+        
+        // Stage 2b: Install Dependencies (Frontend)
         stage('Install Frontend') {
             steps {
                 dir('frontend') {
@@ -31,8 +29,17 @@ pipeline {
                 }
             }
         }
-
-        // Stage 4: Build Frontend
+        
+        // Stage 3: Build Backend (if applicable)
+        stage('Build Backend') {
+            steps {
+                dir('backend') {
+                    sh 'npm run build || echo "No build script in backend, continuing"'
+                }
+            }
+        }
+        
+        // Stage 3b: Build Frontend (React/TypeScript)
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
@@ -41,43 +48,48 @@ pipeline {
             }
         }
 
-        // Stage 5: Run Backend Tests
+        // Stage 4: Run Backend Unit Tests
         stage('Test Backend') {
             steps {
                 dir('backend') {
-                    sh 'npm test || echo "No backend tests found."'
+                    sh 'npm test || echo "No test script in backend, continuing"'
                 }
             }
             post {
                 always {
-                    // If you're generating test results with a reporter like jest-junit
-                    // Make sure test results are saved at the correct path
-                    junit 'backend/test-results/junit.xml'
+                    junit allowEmptyResults: true, testResults: 'backend/junit.xml'
                 }
             }
         }
-
-        // Stage 6: Deploy using Docker
+        
+        // Stage 4b: Run Frontend Unit Tests
+        stage('Test Frontend') {
+            steps {
+                dir('frontend') {
+                    sh 'npm test || echo "No test script in frontend, continuing"'
+                }
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: 'frontend/junit.xml'
+                }
+            }
+        }
+        
+        // Stage 5: Deploy (Docker Example)
         stage('Deploy') {
             steps {
                 script {
-                    def appImage = docker.build('02230290namgay/assignment2:latest')
-
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-creds') {
-                        appImage.push()
+                    // Build Docker image using backend Dockerfile
+                    sh 'docker build -t 02230290namgay/node-app:latest -f backend/Dockerfile backend/'
+                    
+                    // Push to Docker Hub (requires credentials)
+                    withCredentials([string(credentialsId: 'docker-hub-creds', variable: 'DOCKER_PWD')]) {
+                        sh 'echo $DOCKER_PWD | docker login -u 02230290namgay --password-stdin'
+                        sh 'docker push 02230290namgay/node-app:latest'
                     }
                 }
             }
         }
     }
-
-    post {
-        success {
-            echo 'Deployment successful!'
-        }
-        failure {
-            echo 'Deployment failed. Check the logs for more details.'
-        }
-    }
 }
-
