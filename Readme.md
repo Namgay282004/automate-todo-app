@@ -1,4 +1,4 @@
-# To-Do App Deployment with CI/CD (Assignment 1)
+# Assignment I : To-Do App Deployment with CI/CD 
 
 ## Objective
 
@@ -170,7 +170,7 @@ These practices are foundational for modern DevOps and cloud-native workflows.
 
 -----
 
-# Assignment II – CI/CD Pipeline with Jenkins
+# Assignment II: CI/CD Pipeline with Jenkins
 
 ## Objective
 
@@ -293,5 +293,103 @@ Build `#33` succeeded, confirming the issue was fixed.
 - Fixed issues by updating package.json and test scripts.
 
 - Final build succeeded with passing tests.
+
+----
+
+# Assignment III: TODO App CI/CD Deployment with GitHub Actions
+
+## Objective
+
+This project is a CI/CD assignment that demonstrates building and deploying a full-stack TODO application using Docker, GitHub Actions, DockerHub, and Render.com.
+
+The application is split into:
+- `backend/` – Node.js (Express) server
+- `frontend/` – React application
+
+The pipeline builds Docker images for both services and pushes them to DockerHub. Deployments are then triggered on Render.com using deploy webhooks, all automated via GitHub Actions.
+
+## Steps Followed (with Screenshots)
+
+### 1. Project Structure Verification
+
+- Ensured both `backend/` and `frontend/` directories contained a valid `package.json` with necessary scripts
+
+- Verified the repository was set to public
+
+- Confirmed Dockerfiles were correctly placed and structured for both services
+
+### 2. Set Up GitHub Actions Workflow
+
+Created `.github/workflows/main.yml` to automate:
+
+- Docker login
+
+- Build & push for backend and frontend
+
+- Webhook deployment to Render
+
+  ![](img-ass3/1.png)
+
+### 3. Configured GitHub Secrets
+
+Added the following secrets under:
+**Settings** → **Secrets and Variables** → **Actions** (not Codespaces)
+
+
+
+`DOCKERHUB_USERNAME`: Dockerhub Username
+
+`DOCKERHUB_TOKEN`: Personal Access Token from Dockerhub
+
+`RENDER_BACKEND_WEBHOOK_URL`
+
+`RENDER_FRONTEND_WEBHOOK_URL`
+
+![](img-ass3/5.png)
+
+![](img-ass3/2.png)
+
+### 4. Configured Render Deploy Hooks
+- Created two services on Render (backend and frontend)
+
+- Enabled deploy webhooks
+
+- Used those URLs in GitHub secrets
+
+  ![](img-ass3/3.png)
+
+  ![](img-ass3/4.png)
+
+### 5. Triggered Deployment
+Final push to main branch ran the full CI/CD pipeline successfully:
+
+- Images built and pushed
+
+- Render deployment triggered
+
+  ![](img-ass3/6.png)
+
+  Verified that it deployed via Deploy Hook
+
+  ![](img-ass3/7.png)
+## Challenges Faced
+
+### 1. DockerHub login failure in GitHub Actions
+I encountered an error during the DockerHub login step in GitHub Actions:
+
+```
+Error: Username and password required
+```
+The issue occurred because I accidentally added the secrets under
+**Secrets and variables** → **Codespaces** instead of → **Actions**. After moving the secrets to **Actions** scope, the login worked as expected.
+
+## Conclusion
+This part of the assignment helped reinforce practical understanding of CI/CD workflows using Docker, GitHub Actions, and Render. It covered:
+
+- Dockerizing both frontend and backend
+
+- Setting up automated builds and deployment pipelines
+
+Everything now works as expected with every push to the main branch automatically building and deploying the app 
 
 ----
