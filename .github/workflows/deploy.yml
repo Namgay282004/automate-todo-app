@@ -46,7 +46,7 @@ jobs:
         # If webhook isn't available, you can add conditional execution:
         continue-on-error: true
         
-      # 7. Report Deployment Status
+      #7. Report Deployment Status
       - name: Report Deployment Status
         run: |
           echo "Backend image pushed to DockerHub: ${{ secrets.DOCKER_USERNAME }}/todo-backend:latest"
