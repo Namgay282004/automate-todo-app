@@ -393,3 +393,99 @@ This part of the assignment helped reinforce practical understanding of CI/CD wo
 Everything now works as expected with every push to the main branch automatically building and deploying the app 
 
 ----
+
+# Assignment IV: Secure CI/CD Pipeline with Docker, Jenkins, and GitHub Actions
+
+## Objective
+
+This assignment demonstrates how to integrate security best practices into CI/CD workflows using:
+
+- Docker (non-root users and secret management)
+
+- Jenkins (secure DockerHub credential management)
+
+- GitHub Actions (secret handling and secure image deployment)
+
+## Docker Secure Practices
+
+### Docker Security Enhancements
+
+- Updated `Dockerfile` to use a **non-root user** (appuser) to avoid privilege escalation risks.
+
+- Used **Docker secrets** to store sensitive credentials instead of hardcoding them or exposing them in build logs.
+
+  ![](img-ass4/3.png)
+
+### Jenkins Secure Pipeline Setup
+
+- **Credentials** → **Global** → **Add Credentials** → DockerHub username&password(DockerHub Personal Access Token)
+
+- ID used: `docker-hub-creds`
+
+  ![](img-ass4/2.png)
+
+### GitHub Actions Secure Workflow
+
+`.github/workflows/secure-ci.yml`
+
+![](img-ass4/4.png)
+
+GitHub Secrets Stored Under: **Settings** → **Secrets and Variables** → **Actions**
+
+- `DOCKERHUB_USERNAME`
+
+- `DOCKERHUB_TOKEN`
+
+Successfully deployed images to DockerHub via GitHub Actions
+
+![](img-ass4/5.png)
+
+### Challenges Faced
+
+- **Creating a Non-root User in Docker (Frontend)**
+
+  While trying to create a non-root user in the `frontend/Dockerfile`, the build failed with the error:
+
+  ```
+  /bin/sh: groupadd: not found
+  ```
+  ![](img-ass4/1.png)
+
+  This occurred because the base image `nginx:alpine` uses Alpine Linux, which does not include `groupadd` and `useradd` utilities by default. Replacing with debian-compatible commands worked.
+
+  ```
+  # Before (Incorrect for Alpine)
+  RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+
+  # After (Correct for Alpine)
+  RUN addgroup -S appgroup && adduser -S -G appgroup appuser
+  ```
+
+- **Dockerfile Path Error in GitHub Actions**
+
+  The GitHub Actions workflow failed with:
+
+  ```
+  failed to read dockerfile: open Dockerfile: no such file or directory
+  ```
+
+  This happened because the default build context expected a `Dockerfile` in the root directory, but it was located at `frontend/Dockerfile.`
+
+  Explicitly specifying the Dockerfile path and context in the workflow worked.
+
+  ```
+  - name: Build Docker image
+    run: docker build -f frontend/Dockerfile -t secure-frontend ./frontend
+  ```
+
+## Conclusion
+
+This assignment honed my DevSecOps concepts:
+
+- Running containers as non-root users
+
+- Managing Docker credentials securely
+
+- Building and deploying Docker images through secure Jenkins and GitHub pipelines
+
+The workflows ensure a secure image deployments for production-like environments.
