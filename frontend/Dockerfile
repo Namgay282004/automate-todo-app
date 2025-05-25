@@ -12,8 +12,8 @@ RUN npm run build
 # Stage 2: Serve with NGINX
 FROM nginx:alpine
 
-# Create a non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Create a non-root user(Debain-compatible)
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 # Copy built app to nginx html directory
 COPY --from=build /app/build /usr/share/nginx/html

@@ -8,8 +8,8 @@ RUN npm install
 
 COPY . .
 
-# Create a non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Create a non-root user(Debain-compatible)
+RUN addgroup -r appgroup && adduser -r -g appgroup appuser
 
 # Change ownership of working directory
 RUN chown -R appuser:appgroup /app
